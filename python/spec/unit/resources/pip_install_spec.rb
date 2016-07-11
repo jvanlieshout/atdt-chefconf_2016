@@ -1,10 +1,9 @@
 require 'spec_helper'
 
-require 'spec_helper'
-
 describe 'python' do
   let(:chef_run) do
-    runner = ChefSpec::SoloRunner.new(node_attributes.merge(settings).merge(step_into))
+    runner = \
+      ChefSpec::SoloRunner.new(node_attributes.merge(settings).merge(step_into))
     runner.converge(described_recipe)
     runner
   end
@@ -20,7 +19,7 @@ describe 'python' do
   # This is the location to place any ChefSpec global configuration/settings
   # @see https://github.com/sethvargo/chefspec#configuration
   let(:settings) do
-    { }
+    {}
   end
 
   # This is required to test the internal components of a LWRP / Custom Resource
