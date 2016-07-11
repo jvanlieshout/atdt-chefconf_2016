@@ -22,14 +22,14 @@ describe 'python::default' do
     end
 
     it 'installs the necessary packages' do
-      expect(chef_run).to install_package(%w[openssl-devel])
+      expect(chef_run).to install_package(%w(openssl-devel))
     end
 
     it 'installs python 3.4.4' do
-      expect(chef_run).to install_with_make_ark('python').with({
-        version: '3.4.4',
+      expect(chef_run).to install_with_make_ark('python').with({ # rubocop:disable Style/BracesAroundHashParameters, Metrics/LineLength
+        version: '3.4.4', # rubocop:disable Style/IndentHash
         url: 'https://www.python.org/ftp/python/3.4.4/Python-3.4.4.tgz'
-      })
+      }) # rubocop:disable Style/IndentHash
     end
   end
 
@@ -43,8 +43,7 @@ describe 'python::default' do
     end
 
     it 'installs the necessary packages' do
-      expect(chef_run).to install_package(%w[build-essential])
+      expect(chef_run).to install_package(%w(build-essential))
     end
   end
-
 end
