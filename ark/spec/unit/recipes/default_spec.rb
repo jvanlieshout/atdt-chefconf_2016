@@ -57,7 +57,7 @@ describe_recipe 'ark::default' do
       %w( libtool autoconf unzip rsync make gcc autogen shtool pkg-config )
     end
 
-    it_behaves_like 'install package'
+    it_behaves_like 'installs packages'
   end
 
   context 'when no attributes are specified, on FreeBSD' do

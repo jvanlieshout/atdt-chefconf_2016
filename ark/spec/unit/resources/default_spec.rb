@@ -27,6 +27,14 @@ describe 'ark' do
     { step_into: ['ark'] }
   end
 
+  def chef_resource
+    chef_run
+  end
+
+  def run_notified_execute(command)
+    "execute[#{command}]"
+  end
+
   describe 'install' do
     let(:described_recipe) { 'ark_spec::install' }
 
@@ -56,13 +64,50 @@ describe 'ark' do
 
   describe 'install_with_make' do
     let(:described_recipe) { 'ark_spec::install_with_make' }
-    it 'generates the expected resources with the expected actions and notifications'
+    it 'generates the expected resources with the expected actions and notifications' do
+      expect(chef_run).to install_with_make_ark('test_install_with_make')
+
+      expect(chef_run).to create_directory('/usr/local/test_install_with_make-1.5')
+      expect(chef_run).to create_remote_file('/var/chef/cache/test_install_with_make-1.5.tar.gz')
+
+      # resource = chef_run.directory('/usr/local/test_install_with_make-1.5')
+      # expect(resource).to notify('execute[unpack /var/chef/cache/test_install_with_make-1.5.tar.gz]').to(:run)
+      expect(chef_resource.directory('/usr/local/test_install_with_make-1.5')).to \
+        notify(run_notified_execute('unpack /var/chef/cache/test_install_with_make-1.5.tar.gz')).to(:run)
+
+      # resource = chef_run.remote_file('/var/chef/cache/test_install_with_make-1.5.tar.gz')
+      # expect(resource).to notify('execute[unpack /var/chef/cache/test_install_with_make-1.5.tar.gz]').to(:run)
+      expect(chef_resource.remote_file('/var/chef/cache/test_install_with_make-1.5.tar.gz')).to \
+        notify('execute[unpack /var/chef/cache/test_install_with_make-1.5.tar.gz]').to(:run)
+
+      expect(chef_run).not_to run_execute('unpack /var/chef/cache/test_install_with_make-1.5.tar.gz')
+
+      execute_unpack = chef_resource.execute('unpack /var/chef/cache/test_install_with_make-1.5.tar.gz')
+      expect(execute_unpack).to \
+        notify('execute[set owner on /usr/local/test_install_with_make-1.5]').to(:run)
+      expect(execute_unpack).to \
+        notify('execute[autogen /usr/local/test_install_with_make-1.5]').to(:run)
+      expect(execute_unpack).to \
+        notify('execute[configure /usr/local/test_install_with_make-1.5]').to(:run)
+      expect(execute_unpack).to \
+        notify('execute[make /usr/local/test_install_with_make-1.5]').to(:run)
+      expect(execute_unpack).to \
+        notify('execute[make install /usr/local/test_install_with_make-1.5]').to(:run)
+
+      expect(chef_run).not_to run_execute('set owner on /usr/local/test_install_with_make-1.5')
+      expect(chef_run).not_to run_execute('autogen /usr/local/test_install_with_make-1.5')
+      expect(chef_run).not_to run_execute('configure /usr/local/test_install_with_make-1.5')
+      expect(chef_run).not_to run_execute('make /usr/local/test_install_with_make-1.5')
+      expect(chef_run).not_to run_execute('make install /usr/local/test_install_with_make-1.5')
+
+
+    end
   end
 
-  describe 'install with binaries' do
-    let(:described_recipe) { 'ark_spec::install_with_binaries' }
-    it 'generates the expected resources with the expected actions and notifications'
-  end
+  # describe 'install with binaries' do
+    # let(:described_recipe) { 'ark_spec::install_with_binaries' }
+    # it 'generates the expected resources with the expected actions and notifications'
+  # end
 
   # The following pending specifications are commented out so they do not generate
   # more output when running the current test suite.

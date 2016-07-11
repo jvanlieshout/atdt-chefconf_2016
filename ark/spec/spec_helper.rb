@@ -5,7 +5,8 @@ at_exit { ChefSpec::Coverage.report! }
 
 RSpec.configure do |config|
   config.color = true
-  config.log_level = :info
+  # config.log_level = :info
+  config.log_level = :warn
   config.alias_example_group_to :describe_recipe, type: :recipe
 end
 
@@ -24,6 +25,7 @@ shared_context 'converge recipe', type: :recipe do
   end
 
   def attribute(name)
+    # puts node.class
     node[described_cookbook][name]
   end
 
