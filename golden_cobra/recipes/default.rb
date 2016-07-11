@@ -8,14 +8,15 @@ execute 'yum update -y'
 
 package 'sqlite-devel'
 
-# TODO: install python 3.4.4
-# TODO: install python packages: django, uwsgi, and gunicorn
+include_recipe 'python'
+
+%w(django uwsgi gunicorn).each { |package| pip package }
 
 directory '/sites'
 
 package 'git'
 
-search('site','*:*').each do |site_data|
+search('site', '*:*').each do |site_data|
   site_name = site_data[:name]
   site_repository = site_data[:repository]
   site_bind = site_data[:bind]

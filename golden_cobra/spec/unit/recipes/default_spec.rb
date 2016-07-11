@@ -9,8 +9,14 @@ require 'spec_helper'
 describe 'golden_cobra::default' do
   context 'When all attributes are default, on an unspecified platform' do
     let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new do |node,server|
-        # TODO stub the site data on the server
+      runner = ChefSpec::ServerRunner.new do |_node, server|
+        server.create_data_bag('site', { # rubocop: disable Style/BracesAroundHashParameters, Style/LineLength
+          'golden_cobra' => { # rubocop:disable Style/IndentHash
+            'name' => 'golden_cobra',
+            'repository' => 'https://github.com/burtlo/golden_cobra.git',
+            'bind' => '127.0.0.1:8000'
+          }
+        }) # rubocop:disable Style/IndentHash
       end
       runner.converge(described_recipe)
     end
@@ -49,8 +55,12 @@ describe 'golden_cobra::default' do
 
     it 'creates all the defined sites' do
       expect(chef_run).to sync_git('/sites/golden_cobra').with(repository: 'https://github.com/burtlo/golden_cobra.git')
-      expect(chef_run).to run_execute('/usr/local/bin/python3 manage.py migrate').with(cwd: '/sites/golden_cobra')
-      expect(chef_run).to run_execute('gunicorn golden_cobra.wsgi -D -b 127.0.0.1:8000').with(cwd: '/sites/golden_cobra')
+      expect(chef_run).to \
+        run_execute('/usr/local/bin/python3 manage.py migrate') \
+        .with(cwd: '/sites/golden_cobra')
+      expect(chef_run).to \
+        run_execute('gunicorn golden_cobra.wsgi -D -b 127.0.0.1:8000') \
+        .with(cwd: '/sites/golden_cobra')
     end
   end
 end
